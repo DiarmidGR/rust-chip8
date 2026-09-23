@@ -85,4 +85,48 @@ impl Emu {
         self.sp -=1;
         self.stack[self.sp as usize]
     }
+
+    pub fn tick(&mut self) {
+        // Fetch
+        let op = self.fetch();
+        // Decode & Execute
+        self.execute(op);
+    }
+
+    fn execute(&mut self, op: u16) {
+        // TODO
+    }
+
+    // Grab the instruction we are about to execute (op code).
+    // Essentially we store values in ram as 8 bits, so we want to grab
+    // our byte at the pointer as well as the index after the pointer,
+    // and then combine them to get our 16 bit op code
+    fn fetch(&mut self) -> u16 {
+        // Iterate through ram using pointer
+        // higher_byte of 6A would be 6
+        // lower_byte of 6A would be A
+        let higher_byte = self.ram[self.pc as usize] as u16;
+        let lower_byte = self.ram[(self.pc + 1) as usize] as u16;
+
+        // Pad right of higher_byte with 8 bits, OR operation with lower_byte
+        // To get op code
+        let op = (higher_byte << 8) | lower_byte;
+        self.pc +=2;
+        op
+    }
+
+    pub fn tick_timers(&mut self) {
+        if self.dt > 0 {
+            self.dt -= 1;
+        }
+
+        if self.st > 0 {
+            if self.st == 1 {
+                // BEEP
+                // audio isn't covered in our learning reference, so this will
+                // be a project for later
+            }
+            self.st -= 1;
+        }
+    }
 }
