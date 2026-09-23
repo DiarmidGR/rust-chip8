@@ -94,7 +94,15 @@ impl Emu {
     }
 
     fn execute(&mut self, op: u16) {
-        // TODO
+        // Separate out each hex digit
+        let digit1 = (op & 0xF000) >> 12;
+        let digit2 = (op & 0x0F00) >> 8;
+        let digit3 = (op & 0x00F0) >> 4;
+        let digit4 = op & 0x000F;
+
+        match (digit1, digit2, digit3, digit4) {
+            (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),
+        }
     }
 
     // Grab the instruction we are about to execute (op code).
