@@ -273,6 +273,56 @@ impl Emu {
                 self.pc = (self.v_reg[0] as u16) + nnn;
             },
 
+            // VX = rand() & NN
+            (0xC, _, _, _) => {
+                let x = digit2 as usize;
+                let nn = (op & 0xFF) as u8;
+                let rng: u8 = random();
+                self.v_reg[x] = rng & nn;
+            },
+
+            // Draw Sprite
+            (0xD, _, _, _) => {
+                // Get x and y coords for our sprite
+                let x_coord = self.v_reg[digit2 as usize] as u16;
+                let y_coord = self.v_reg[digit3 as usize] as u16;
+                
+                // Last digit determines how many rows high the sprite is
+                let num_rows = digit4;
+
+                // Keep track if any pixels are flipped
+                let mut flipped = false;
+
+                // Iterate over each row of our sprite
+                for y_line in 0..num_rows {
+                    // Find memory address row's data is stored
+                    let addr = self.i_reg + y_line as u16;
+                    let pixels = self.ram[addr as usize];
+
+                    // Iterate over each column in our row
+                    for x_line in 0..8 {
+                        if (pixels & (0b1000_000 >> x_line)) != 0 {
+                            // Use a mask to fetch current pixels bit. Only flip if 1
+                            let x = (x_coord + x_line) as usize % SCREEN_WIDTH;
+                            let y = (y_coord + y_line) as usize % SCREEN_HEIGHT;
+
+                            // Get pixels index for 1D screen array
+                            let idx = x + SCREEN_WIDTH * y;
+
+                            // Check if we're about to flip the pixel and set
+                            flipped |= self.screen[idx];
+                            self.screen[idx] ^= true;
+                        }
+                    }
+                }
+                // Populate VF register
+                if flipped {
+                    self.v_reg[0xF] = 1;
+                } else {
+                    self.v_reg[0xF] = 0;
+                }
+            },
+
             (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),
         }
     }
