@@ -1,4 +1,4 @@
-use std::os::unix::net::UnixListener;
+use rand::random;
 
 const FONTSET_SIZE: usize = 80;
 const FONTSET: [u8; FONTSET_SIZE] = [
