@@ -436,7 +436,7 @@ impl Emu {
             },
 
             // Load I into V0 - VX
-            (0xF, _, 6, 6) => {
+            (0xF, _, 6, 5) => {
                 let x = digit2 as usize;
                 let i = self.i_reg as usize;
                 for idx in 0..=x {
