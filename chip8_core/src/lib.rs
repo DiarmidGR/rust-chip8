@@ -315,7 +315,7 @@ impl Emu {
 
                     // Iterate over each column in our row
                     for x_line in 0..8 {
-                        if (pixels & (0b1000_000 >> x_line)) != 0 {
+                        if (pixels & (0b1000_0000 >> x_line)) != 0 {
                             // Use a mask to fetch current pixels bit. Only flip if 1
                             let x = (x_coord + x_line) as usize % SCREEN_WIDTH;
                             let y = (y_coord + y_line) as usize % SCREEN_HEIGHT;
