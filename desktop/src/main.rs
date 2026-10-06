@@ -3,6 +3,10 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 use sdl2::event::Event;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 
 const SCALE: u32 = 15;
 const WINDOW_WIDTH: u32 = (SCREEN_WIDTH as u32) * SCALE;
@@ -46,6 +50,30 @@ fn main() {
                 },
                 _ => ()
             }
+
+            chip8.tick();
+            draw_screen(&chip8, &mut canvas);
         }
     }
+}
+
+fn draw_screen(emu: &Emu, canvas: &mut Canvas<Window>) {
+    // Clear canvas as black
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
+
+    let screen_buf = emu.get_display();
+    // Now set draw color to white, iterate through each point and see if it should be drawn
+    canvas.set_draw_color(Color::RGB(255, 255, 255));
+    for (i, pixel) in screen_buf.iter().enumerate() {
+        if *pixel {
+            // Convert our 1D arrays index into a 2D (x,y) coordinate
+            let x = (i % SCREEN_WIDTH) as u32;
+            let y = (i / SCREEN_WIDTH) as u32;
+            let rect = Rect::new((x * SCALE) as i32, (y * SCALE) as i32, SCALE, SCALE);
+            canvas.fill_rect(rect).unwrap();
+        }
+    }
+
+    canvas.present();
 }
