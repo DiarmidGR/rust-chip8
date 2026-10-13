@@ -34,3 +34,22 @@ select {
     color: white;
     font-family: "Silkscreen", sans-serif;
 }
+
+.controls{
+    text-align: center;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    font-size:larger;
+}
+
+.pong {
+    display:flex;
+    flex-direction:row;
+}
+
+.pong-left,.pong-right{
+    display:flex;
+    flex-direction:column;
+    margin: 10px;
+}

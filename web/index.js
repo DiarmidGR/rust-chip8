@@ -104,6 +104,7 @@ async function run () {
                 console.error(err)
                 alert(err.message)
             })
+        showcontrols(selectedRom)
     }
 
     romSelect.addEventListener("change", function (evt) {
@@ -138,6 +139,7 @@ async function run () {
                 console.error(err)
                 alert(err.message)
             })
+        showcontrols(romName)
     }, false)
 
 
@@ -158,6 +160,29 @@ async function run () {
         anim_frame = window.requestAnimationFrame(() => {
             mainloop(chip8)
         })
+    }
+
+    // changes control scheme shown below the canvas
+    function showcontrols(rom) {
+        const controls = document.getElementById("controls")
+        // Iterate through our controls element children to hide their display
+        for (const child of controls.children) {
+            child.style.display = "none"
+        }
+        const gameScheme = document.getElementById(rom)
+        switch (rom) {
+            case "INVADERS":
+                gameScheme.style.display = "flex"
+                controls.style.display = "flex"
+                break
+            case "PONG":
+                gameScheme.style.display = "flex"
+                controls.style.display = "flex"
+                break
+            default:
+                controls.style.display = "none"
+                break
+        }
     }
 }
 run().catch(console.error)
