@@ -104,8 +104,8 @@ async function run () {
                 console.error(err)
                 alert(err.message)
             })
-        showcontrols(selectedRom)
     }
+    showcontrols(selectedRom)
 
     romSelect.addEventListener("change", function (evt) {
         // Stop previous game from rendering, if there is one

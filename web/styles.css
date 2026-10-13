@@ -41,6 +41,7 @@ select {
     display: flex;
     flex-direction: column;
     font-size:larger;
+    display: none;
 }
 
 .pong {
