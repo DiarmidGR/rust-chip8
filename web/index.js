@@ -87,23 +87,7 @@ async function run () {
     // Initialize rom provided in URL, if available
     if (selectedRom) {
         // Load the ROM from the roms directory, send to .wasm, start main loop
-        fetch(`roms/${selectedRom}`)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`Failed to load ROM: ${selectedRom}`)
-                }
-                return res.arrayBuffer()
-            })
-            .then(buffer => {
-                const rom = new Uint8Array(buffer)
-                chip8.reset()
-                chip8.load_game(rom)
-                mainloop(chip8)
-            })
-            .catch(err => {
-                console.error(err)
-                alert(err.message)
-            })
+        loadRom(selectedRom)
     }
     showcontrols(selectedRom)
 
@@ -122,23 +106,7 @@ async function run () {
         window.history.pushState({}, '', `?rom=${romName}`);
 
         // Load the ROM from the roms directory, send to .wasm, start main loop
-        fetch(`roms/${romName}`)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`Failed to load ROM: ${romName}`)
-                }
-                return res.arrayBuffer()
-            })
-            .then(buffer => {
-                const rom = new Uint8Array(buffer)
-                chip8.reset()
-                chip8.load_game(rom)
-                mainloop(chip8)
-            })
-            .catch(err => {
-                console.error(err)
-                alert(err.message)
-            })
+        loadRom(romName)
         showcontrols(romName)
     }, false)
 
@@ -183,6 +151,28 @@ async function run () {
                 controls.style.display = "none"
                 break
         }
+    }
+
+    // Load the ROM from the roms directory, send to .wasm, start main loop
+    function loadRom(romName) {
+        fetch(`roms/${romName}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to load ROM: ${romName}`)
+                }
+                return res.arrayBuffer()
+            })
+            .then(buffer => {
+                const rom = new Uint8Array(buffer)
+                chip8.reset()
+                chip8.load_game(rom)
+                mainloop(chip8)
+            })
+            .catch(err => {
+                console.error(err)
+                alert(err.message)
+            }
+        )
     }
 }
 run().catch(console.error)
