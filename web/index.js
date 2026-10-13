@@ -147,6 +147,10 @@ async function run () {
                 gameScheme.style.display = "flex"
                 controls.style.display = "flex"
                 break
+            case "TETRIS":
+                gameScheme.style.display = "flex"
+                controls.style.display = "flex"
+                break
             default:
                 controls.style.display = "none"
                 break
