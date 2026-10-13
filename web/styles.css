@@ -27,4 +27,10 @@ canvas {
 
 select {
     margin: 10px;
+    background-color:black;
+    border: none;
+    outline: 2px solid white;
+    outline-offset: 2px;
+    color: white;
+    font-family: "Silkscreen", sans-serif;
 }
