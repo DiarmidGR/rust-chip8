@@ -1,21 +1,32 @@
 use chip8_core::*;
-use wasm_bindgen::prelude::*;
-use web_sys::KeyboardEvent;
+use wasm_bindgen::{prelude::*, JsCast};
+use web_sys::{KeyboardEvent, CanvasRenderingContext2d, HtmlCanvasElement};
 use js_sys::Uint8Array;
 
 // Tells the compiler that this struct needs to be configured for WebAssembly
 #[wasm_bindgen]
 pub struct EmuWasm {
     chip8: Emu,
+    ctx: CanvasRenderingContext2d,
 }
 
 #[wasm_bindgen]
 impl EmuWasm {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> EmuWasm {
-        EmuWasm {
-            chip8: Emu::new(),
-        }
+    pub fn new() -> Result<EmuWasm, JsValue> {
+        let chip8 = Emu::new();
+
+        let document = web_sys::window().unwrap().document().unwrap();
+        let canvas = document.get_element_by_id("canvas").unwrap();
+        let canvas: HtmlCanvasElement = canvas
+            .dyn_into::<HtmlCanvasElement>()
+            .map_err(|_| ())
+            .unwrap();
+        let ctx = canvas.get_context("2d")
+            .unwrap().unwrap()
+            .dyn_into::<CanvasRenderingContext2d>()
+            .unwrap();
+        Ok(EmuWasm{chip8, ctx})
     }
 
     #[wasm_bindgen]
@@ -48,7 +59,19 @@ impl EmuWasm {
 
     #[wasm_bindgen]
     pub fn draw_screen(&mut self, scale: usize) {
-        // TODO
+        let disp = self.chip8.get_display();
+            for i in 0..(SCREEN_WIDTH * SCREEN_HEIGHT) {
+                if disp[i] {
+                    let x = i % SCREEN_WIDTH;
+                    let y = i / SCREEN_WIDTH;
+                    self.ctx.fill_rect(
+                        (x * scale) as f64,
+                        (y * scale) as f64,
+                        scale as f64,
+                        scale as f64
+                );
+            }
+        }
     }
 }
 
