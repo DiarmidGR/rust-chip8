@@ -1,0 +1,19 @@
+# Rust build artifacts (rebuilt inside the container)
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Generated wasm output (rebuilt inside the container)
+wasm/pkg/wasm.js
+wasm/pkg/wasm_bg.wasm
+wasm/pkg/wasm.d.ts
+wasm/pkg/wasm_bg.wasm.d.ts
+
+# Git
+.git/
+.gitignore
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
