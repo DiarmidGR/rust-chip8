@@ -14,7 +14,34 @@ const ctx = canvas.getContext("2d")
 ctx.fillStyle = "black"
 ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE)
 
-const input = document.getElementById("fileinput")
+const romSelect = document.getElementById("romselect")
+
+// ROMs available in the sibling `roms/` directory
+const ROMS = [
+    "15PUZZLE",
+    "BLINKY",
+    "BLITZ",
+    "BRIX",
+    "CONNECT4",
+    "GUESS",
+    "HIDDEN",
+    "INVADERS",
+    "KALEID",
+    "MAZE",
+    "MERLIN",
+    "MISSILE",
+    "PONG",
+    "PONG2",
+    "PUZZLE",
+    "SYZYGY",
+    "TANK",
+    "TETRIS",
+    "TICTAC",
+    "UFO",
+    "VBRIX",
+    "VERS",
+    "WIPEOFF"
+]
 
 async function run () {
     await init()
@@ -28,29 +55,48 @@ async function run () {
         chip8.keypress(evt, false)
     })
 
-    input.addEventListener("change", function (evt) {
-        // Handle file loading
-        // Stop previous game fom rendering, if there is one
+    // Populate the dropdown with all available ROMs
+    const defaultOption = document.createElement("option")
+    defaultOption.textContent = "Select a game"
+    defaultOption.value = ""
+    romSelect.appendChild(defaultOption)
+
+    for (const rom of ROMS) {
+        const option = document.createElement("option")
+        option.textContent = rom
+        option.value = rom
+        romSelect.appendChild(option)
+    }
+
+    romSelect.addEventListener("change", function (evt) {
+        // Stop previous game from rendering, if there is one
         if (anim_frame != 0) {
             window.cancelAnimationFrame(anim_frame)
         }
 
-        let file = evt.target.files[0]
-        if (!file) {
-            alert("Failed to read file")
+        const romName = evt.target.value
+        if (!romName) {
             return
         }
 
-        // Load in game as Uint8Array, send to .wasm, start main loop
-        let fr = new FileReader()
-        fr.onload = function(e) {
-            let buffer = fr.result
-            const rom = new Uint8Array(buffer)
-            chip8.reset()
-            chip8.load_game(rom)
-            mainloop(chip8)
-        }
-        fr.readAsArrayBuffer(file)
+        // Load the ROM from the roms directory, send to .wasm, start main loop
+        fetch(`../roms/${romName}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to load ROM: ${romName}`)
+                }
+                return res.arrayBuffer()
+            })
+            .then(buffer => {
+                const rom = new Uint8Array(buffer)
+                chip8.reset()
+                chip8.load_game(rom)
+                mainloop(chip8)
+            })
+            .catch(err => {
+                console.error(err)
+                alert(err.message)
+            })
     }, false)
 
 
