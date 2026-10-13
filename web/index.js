@@ -55,6 +55,11 @@ async function run () {
         chip8.keypress(evt, false)
     })
 
+    // Prevent accidental key press from changing selected rom
+    document.getElementById('romselect').addEventListener('keydown', function (e) {
+        e.preventDefault();
+    })
+
     // Populate the dropdown with all available ROMs
     const defaultOption = document.createElement("option")
     defaultOption.textContent = "Select a game"
@@ -80,7 +85,7 @@ async function run () {
         }
 
         // Load the ROM from the roms directory, send to .wasm, start main loop
-        fetch(`../roms/${romName}`)
+        fetch(`roms/${romName}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Failed to load ROM: ${romName}`)
