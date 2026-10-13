@@ -60,17 +60,50 @@ async function run () {
         e.preventDefault();
     })
 
+    // Get selected Rom from URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedRom = urlParams.get('rom');
+    console.log("URL rom param: " + selectedRom);
+
     // Populate the dropdown with all available ROMs
     const defaultOption = document.createElement("option")
     defaultOption.textContent = "Select a game"
     defaultOption.value = ""
     romSelect.appendChild(defaultOption)
 
+    // Populate all ROM options
     for (const rom of ROMS) {
         const option = document.createElement("option")
         option.textContent = rom
         option.value = rom
         romSelect.appendChild(option)
+    }
+
+    // Now that options exist, select the one matching URL param
+    if (selectedRom) {
+        romSelect.value = selectedRom
+    }
+
+    // Initialize rom provided in URL, if available
+    if (selectedRom) {
+        // Load the ROM from the roms directory, send to .wasm, start main loop
+        fetch(`roms/${selectedRom}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to load ROM: ${selectedRom}`)
+                }
+                return res.arrayBuffer()
+            })
+            .then(buffer => {
+                const rom = new Uint8Array(buffer)
+                chip8.reset()
+                chip8.load_game(rom)
+                mainloop(chip8)
+            })
+            .catch(err => {
+                console.error(err)
+                alert(err.message)
+            })
     }
 
     romSelect.addEventListener("change", function (evt) {
@@ -83,6 +116,9 @@ async function run () {
         if (!romName) {
             return
         }
+
+        // Update window URL to reflect loaded rom
+        window.history.pushState({}, '', `?rom=${romName}`);
 
         // Load the ROM from the roms directory, send to .wasm, start main loop
         fetch(`roms/${romName}`)
