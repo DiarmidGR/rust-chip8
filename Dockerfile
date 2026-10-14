@@ -21,6 +21,9 @@ RUN wasm-pack build --target web --out-dir pkg wasm
 # ---------------------------------------------------------------------------
 FROM nginx:alpine
 
+# Make browsers revalidate on every load (ETag still avoids re-downloads)
+COPY web-nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy the generated wasm bindings into nginx's default web root
 COPY --from=builder /app/wasm/pkg/wasm.js      /usr/share/nginx/html/wasm.js
 COPY --from=builder /app/wasm/pkg/wasm_bg.wasm /usr/share/nginx/html/wasm_bg.wasm
